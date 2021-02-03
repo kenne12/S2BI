@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <h:form id="UtilisateurListerForm">
+
+        <p:messages id="growl" closable="true">
+            <p:effect type="pulsate" event="load" delay="50" />
+        </p:messages>
+
+        <br/>
+
+        <center>
+            <h:panelGrid columns="6" columnClasses="column">
+
+                <p:outputLabel value="#{langue.costing}" for="periode_costing"/>
+                <p:selectOneMenu id="periode_costing" filter="true" value="#{budgetParSfController.periodecosting.idperiodecosting}" >
+                    <f:selectItem itemLabel="#{langue.choisir}" itemValue="0"/>
+                    <f:selectItems value="#{budgetParSfController.periodecostings}" var="pc" itemLabel="#{pc.libelle}" itemValue="#{pc.idperiodecosting}"/>
+                    <p:ajax update="datalist" listener="#{budgetParSfController.updateData()}" />
+                </p:selectOneMenu>
+                <p:message for="periode_costing" id="msg_pc"/>
+
+                <p:outputLabel value="#{langue.devise}" for="devise"/>
+                <p:selectOneMenu id="devise" filter="true" value="#{budgetParSfController.devise.iddevise}" >
+                    <f:selectItems value="#{budgetParSfController.devises}" var="dev" itemLabel="#{dev.nom}" itemValue="#{dev.iddevise}"/>
+                    <p:ajax update="datalist" listener="#{budgetParSfController.updateDevise()}"/>
+                </p:selectOneMenu>
+                <p:message for="devise" id="msg_devise"/>
+
+            </h:panelGrid>
+        </center>
+
+        <p:separator/>
+
+        <p:dataTable id="datalist" 
+                     value="#{budgetParSfController.bailleurfonds}" 
+                     var="item"                             
+                     paginator="true"
+                     rowKey="#{item.idbailleurfond}"
+                     rows="15"
+                     rowsPerPageTemplate="10,20,30,40,50"
+                     style="width: 98%;margin-left: 1%"
+                     rowIndexVar="index"
+                     emptyMessage="#{langue.tableau_vide}"
+                     widgetVar="fonctionTable"
+                     draggableColumns="true"
+                     resizableColumns="true">     
+
+            <f:facet name="header"> 
+                <h:outputText value="#{langue.budget}"/>
+            </f:facet>
+
+            <p:columnGroup type="header">
+                <p:row>
+                    <p:column class="hardBreak" colspan="2" rowspan="2" headerText="#{langue.bailleur_fond}"/>
+                    <p:column class="hardBreak" colspan="#{budgetParSfController.sousperiodecostings.size()}" headerText="#{langue.periode}"/> 
+                    <p:column class="hardBreak" rowspan="2" headerText="#{langue.totaux}"/> 
+                </p:row>
+                <p:row>
+                    <ui:repeat value="#{budgetParSfController.sousperiodecostings}" var="spc">
+                        <p:column class="hardBreak" headerText="#{spc.idperiode.nom}"/>
+                    </ui:repeat>
+                </p:row>
+            </p:columnGroup>
+
+            <p:column colspan="2" style="height: 40px">
+                <h:outputText value="#{item.nom}"/>
+            </p:column>
+
+            <p:columns style="text-align: right" value="#{budgetParSfController.sousperiodecostings}" var="var">
+                <h:outputText value="#{budgetParSfController.loadValue(item,var)}">
+                    <f:convertNumber/>
+                </h:outputText>
+            </p:columns>
+
+            <p:column style="text-align: right">
+                <h:outputText value="#{budgetParSfController.loadValue1(item)}">
+                    <f:convertNumber/>
+                </h:outputText>
+            </p:column>
+
+            <p:columnGroup type="footer">
+                <p:row>
+                    <p:column colspan="2" style="text-align:right" footerText="Totaux" />                                       
+                    <p:columns style="text-align: right" value="#{budgetParSfController.sousperiodecostings}" var="s" footerText="#{budgetParSfController.sommeBudget(s)}">                        
+                    </p:columns>
+                    <p:column style="text-align:right" footerText="#{budgetParSfController.loadValue()}" />
+                </p:row>
+            </p:columnGroup>
+
+        </p:dataTable>
+
+    </h:form>
+
+    <!-- ****************************************Information************************************************************************************************************************************************************************************************************** -->
+
+    <p:dialog id="notify1" widgetVar="NotifyDialog1" height="400" width="700" resizable="true" responsive="true" modal="true" style="text-align: center; font-size: 14px; font-family: Cambria;">
+        <f:facet name="header">
+            <h:outputText style="font-family: Cambria; font-size: 14px;" value="#{budgetParSfController.routine.titleNotify}" />
+        </f:facet>
+        <h:form id="NotifyForm1">
+            <h:graphicImage id="nt_img" url="#{budgetParSfController.routine.iconMessage}" style="cursor:pointer" />
+
+            <hr size="3" style="background-color: cornflowerblue;"/>
+
+            <h:outputText id="nt_msg" value="#{budgetParSfController.routine.message}"/>
+
+            <hr size="3" style="background-color: cornflowerblue; margin-top: 5%;"/>
+
+            <p:commandButton style="font-family: Cambria; font-size: 14px;" value="#{langue.fermer}" onclick="PF('NotifyDialog1').hide()" type="button" immediate="true"/>
+
+            <hr size="3" style="background-color: cornflowerblue;"/>
+        </h:form>
+    </p:dialog>
+
+    <!-- ****************************************Information************************************************************************************************************************************************************************************************************** -->
+</ui:composition>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog  
+            widgetVar="SelectPeriodDialog" 
+            modal="true" 
+            resizable="false" 
+            appendTo="@(body)"
+            width="700"
+            height="350"
+            style="overflow: auto"
+            header="#{langue['Titre.Dlg.Creation']} : #{langue.population}" 
+            closeOnEscape="true">
+
+            <h:form id="SelectPeriodCreerForm">
+                <h:panelGroup id="display">
+
+                    <h:panelGrid rendered="#{financementController.financement !=null}" columns="3"> 
+                        
+                        <p:outputLabel for="bailleur_f" value="#{langue.bailleur_fond}" />
+                        <p:inputText disabled="true" id="bailleur_f" value="#{financementController.financement.idbailleurfond.nom}" />
+                        <p:message for="bailleur_f" id="msg_bailleur_f"/>
+                        
+                        <p:outputLabel for="periode" value="#{langue.periode}" />
+                        <p:inputText disabled="true" id="periode" value="#{financementController.financement.idsousPeriode.idperiode.nom}" />
+                        <p:message for="periode" id="msg_periode"/>
+                        
+                        <p:outputLabel for="t_u_o" value="#{langue.type_unite_organisation}" />
+                        <p:inputText disabled="true" id="t_u_o" value="#{financementController.financement.idtypeuniteorganisation.nom}" />
+                        <p:message for="t_u_o" id="msg_t_u_o"/>
+
+                        <p:outputLabel for="valeur" value="#{langue.valeur}" />
+                        <p:inputText id="valeur" value="#{financementController.financement.pourcentage}" />
+                        <p:message for="valeur" id="msg_valeur"/>
+
+                    </h:panelGrid>
+
+                    <p:separator/>
+
+                    <p:commandButton style="float: right" actionListener="#{financementController.create()}" 
+                                     value="#{langue['Conv.Enregistrer']}" 
+                                     update="display,:notify1,:actionsForm,:UtilisateurCreerForm:datalist" 
+                                     onclick="PF('AjaxNotifyDialog').show()" icon="ui-icon-check"/>
+
+                    <p:commandButton style="float: left" value="#{langue.annuler}" oncomplete="PF('SelectPeriodDialog').hide()" icon="ui-icon-close"/>
+                </h:panelGroup>  
+
+            </h:form>
+
+        </p:dialog>
+
+    </ui:composition>
+
+</html>

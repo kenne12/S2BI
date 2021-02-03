@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition>
+
+        <p:dialog id="UtilisateurCreerDlg" 
+                  widgetVar="UtilisateurCreerDialog" 
+                  modal="true" resizable="false" 
+                  appendTo="@(body)"
+                  width="1200"
+                  height="650"
+                  style="overflow: auto"
+                  header="#{langue['Titre.Dlg.Creation']} : #{langue.projection_cible}" 
+                  closeOnEscape="true">
+
+            <h:form id="UtilisateurCreerForm">
+                <h:panelGroup id="display">
+
+                    <center>
+                        <h:panelGrid columns="3" columnClasses="column">
+
+                            <p:outputLabel value="#{langue.unite_organisation}" for="unite_organisation"/>
+                            <p:selectOneMenu id="unite_organisation" filter="true" value="#{projectionCibleController.uniteorganisation.iduniteorganisation}" >
+                                <f:selectItem itemLabel="#{langue.choisir}" itemValue="0"/>
+                                <f:selectItems value="#{projectionCibleController.uniteorganisations}" var="uo" itemLabel="#{uo.nom}" itemValue="#{uo.iduniteorganisation}"/>
+                                <p:ajax update="datalist,periode,population" listener="#{projectionCibleController.updateData()}" />
+                            </p:selectOneMenu>
+                            <p:message for="unite_organisation" id="msg_uo"/>
+
+                            <p:outputLabel value="#{langue.periode_costing}" for="periode_costing"/>
+                            <p:selectOneMenu id="periode_costing" filter="true" value="#{projectionCibleController.periodecosting.idperiodecosting}" >
+                                <f:selectItem itemLabel="#{langue.choisir}" itemValue="0"/>
+                                <f:selectItems value="#{projectionCibleController.periodecostings}" var="pc" itemLabel="#{pc.libelle}" itemValue="#{pc.idperiodecosting}"/>
+                                <p:ajax update="datalist,periode,population" listener="#{projectionCibleController.updateData()}" />
+                            </p:selectOneMenu>
+                            <p:message for="periode_costing" id="msg_pc"/>
+
+                            <p:outputLabel value="#{langue.periode_base}" />
+                            <p:outputLabel id="periode" value="#{projectionCibleController.sousperiodecosting.idperiode.nom}" />
+                            <p:outputLabel value="" />
+
+                            <p:outputLabel value="#{langue.population}" />
+                            <p:outputLabel id="population" value="#{projectionCibleController.couverturepopulation.valeur}">
+                                <f:convertNumber/> 
+                            </p:outputLabel>
+                            <p:outputLabel value=""/>
+
+                            <p:outputLabel value="#{langue.mode_projection}" for="mode_projection"/>
+                            <p:selectOneMenu id="mode_projection" filter="true" value="#{projectionCibleController.modeProjection}" >
+                                <f:selectItem itemLabel="#{langue.choisir}" itemValue="0"/>
+                                <f:selectItem itemLabel="#{langue.interpollation_lineaire}" itemValue="1"/>
+                                <p:ajax update="datalist,periode,population" listener="#{projectionCibleController.updateRenderedColumn()}" />
+                            </p:selectOneMenu>
+                            <p:message for="mode_projection" id="msg_mod_projection"/>
+
+                        </h:panelGrid>
+                    </center>
+
+                    <p:separator/>
+
+                    <center>
+                        <p:commandButton update="datalist,:notify1" actionListener="#{projectionCibleController.generate()}" value="#{langue.generer}" onclick="PF('AjaxNotifyDialog').show()" />
+                    </center>
+
+                    <p:separator/>
+
+                    <p:dataTable id="datalist" 
+                                 value="#{projectionCibleController.selectedCrs}" 
+                                 var="item"                             
+                                 paginator="true"
+                                 editable="true" 
+                                 rowKey="#{item.idciblerealisation}"
+                                 rows="#{projectionCibleController.selectedCrs.size()}"
+                                 rowsPerPageTemplate="10,20,30,40,50"
+                                 style="width: 98%;margin-left: 1%"
+                                 rowIndexVar="index"
+                                 emptyMessage="#{langue.tableau_vide}"
+                                 widgetVar="fonctionTable"
+                                 draggableColumns="true"
+                                 resizableColumns="true"
+                                 editMode="cell">
+
+                        <f:facet name="header"> 
+                            <h:outputText value="#{langue.couverture}"/>
+                        </f:facet>
+
+                        <p:columnGroup type="header">
+                            <p:row>
+                                <p:column class="hardBreak" colspan="5" rowspan="2" headerText="#{langue.indicateur}"/>
+                                <p:column class="hardBreak" rowspan="2" headerText="R #{projectionCibleController.sousperiodecosting.idperiode.nom}"/>                                
+                                <p:column class="hardBreak" colspan="#{projectionCibleController.sousperiodecostings.size()}" headerText="#{langue.periode}"/> 
+                                <p:column rendered="#{projectionCibleController.renderedCible}" class="hardBreak" rowspan="2" headerText="#{langue.val_cible}"/>
+                                <p:column class="hardBreak" rowspan="2" headerText="#{langue.pas}"/>
+                            </p:row>
+                            <p:row>
+                                <ui:repeat value="#{projectionCibleController.sousperiodecostings}" var="spc">
+                                    <p:column class="hardBreak" headerText="Ci #{spc.idperiode.nom}"/>
+                                </ui:repeat>
+                            </p:row>
+                        </p:columnGroup>
+
+                        <p:column colspan="5" >
+                            <h:outputText value="#{item.idindicateur.idtypeindicateur.code} #{item.idindicateur.code} #{item.idindicateur.nom}"/>
+                        </p:column>
+
+                        <p:column style="text-align: center">
+                            <h:outputText value="#{item.valeurrealisee.intValue()}" >
+                                <f:convertNumber/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:columns style="text-align: center" value="#{projectionCibleController.sousperiodecostings}" var="var">
+                            <h:outputText value="#{projectionCibleController.loadValue(item,var).valeurcible.intValue()}">
+                                <f:convertNumber/>
+                            </h:outputText>
+                        </p:columns>
+
+                        <p:column style="text-align: center">
+                            <p:cellEditor>
+                                <f:facet name="output">
+                                    <h:outputText value="#{item.valCibleFin.intValue()}"/>
+                                </f:facet>
+                                <f:facet  name="input">
+                                    <p:inputText required="true" value="#{item.valCibleFin}">                                             
+                                        <p:ajax event="keyup"/>
+                                    </p:inputText>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+
+                        <p:column style="text-align: center">
+                            <h:outputText value="#{item.pasValCible.intValue()}"/>
+                        </p:column>
+
+                    </p:dataTable>
+
+                    <p:separator/>
+
+                    <center>
+                        <p:commandButton value="#{langue.annuler}"
+                                         oncomplete="PF('UtilisateurCreerDialog').hide()"
+                                         icon="ui-icon-close"
+                                         update=":UtilisateurListerForm:datalist,:actionsForm"/>
+
+                    </center>
+                    
+                </h:panelGroup>  
+
+            </h:form>
+
+        </p:dialog>
+
+    </ui:composition>
+
+</html>

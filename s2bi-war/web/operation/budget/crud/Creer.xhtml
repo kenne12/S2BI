@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition>
+
+        <p:dialog id="UtilisateurCreerDlg" 
+                  widgetVar="UtilisateurCreerDialog" 
+                  modal="true" resizable="false" 
+                  appendTo="@(body)"
+                  width="1200"
+                  height="650"
+                  style="overflow: auto"
+                  header="#{langue['Titre.Dlg.Creation']} : #{langue.budget}" 
+                  closeOnEscape="true">
+
+            <h:form id="UtilisateurCreerForm">
+
+                <h:panelGroup id="display">
+
+                    <center>
+                        <h:panelGrid columns="3" columnClasses="column">
+
+                            <p:outputLabel value="#{langue.unite_organisation}" for="unite_organisation"/>
+                            <p:selectOneMenu id="unite_organisation" filter="true" value="#{budgetController.uniteorganisation.iduniteorganisation}" >
+                                <f:selectItem itemLabel="#{langue.choisir}" itemValue="0"/>
+                                <f:selectItems value="#{budgetController.uniteorganisations}" var="uo" itemLabel="#{uo.nom}" itemValue="#{uo.iduniteorganisation}"/>
+                                <p:ajax update="datalist,periode,population,:notify1" listener="#{budgetController.updateData()}" />
+                            </p:selectOneMenu>
+                            <p:message for="unite_organisation" id="msg_uo"/>
+
+                            <p:outputLabel value="#{langue.periode_costing}" for="periode_costing"/>
+                            <p:selectOneMenu id="periode_costing" filter="true" value="#{budgetController.periodecosting.idperiodecosting}" >
+                                <f:selectItem itemLabel="#{langue.choisir}" itemValue="0"/>
+                                <f:selectItems value="#{budgetController.periodecostings}" var="pc" itemLabel="#{pc.libelle}" itemValue="#{pc.idperiodecosting}"/>
+                                <p:ajax update="datalist,periode,population,:notify1" listener="#{budgetController.updateData()}" />
+                            </p:selectOneMenu>
+                            <p:message for="periode_costing" id="msg_pc"/>
+
+                            <p:outputLabel value="#{langue.periode_base}" />
+                            <p:outputLabel id="periode" value="#{budgetController.sousperiodecosting.idperiode.nom}" />
+                            <p:outputLabel value="" />
+
+                            <p:outputLabel value="#{langue.population}" />
+                            <p:outputLabel id="population" value="#{budgetController.couverturepopulation.valeur}">
+                                <f:convertNumber/> 
+                            </p:outputLabel>
+                            <p:outputLabel value=""/>
+
+                        </h:panelGrid>
+                    </center>
+
+                    <p:separator/>
+
+                    <center>
+                        <p:commandButton update="datalist,:notify1" actionListener="#{budgetController.generate()}" value="#{langue.generer}" onclick="PF('AjaxNotifyDialog').show()" />
+                    </center>
+
+                    <p:separator/>
+
+                    <p:dataTable id="datalist" 
+                                 value="#{budgetController.selectedBudgets}" 
+                                 var="item"                             
+                                 paginator="true"
+                                 editable="true" 
+                                 rowKey="#{item.idbudget}"
+                                 rows="15"
+                                 rowsPerPageTemplate="10,20,30,40,50"
+                                 style="width: 98%;margin-left: 1%"
+                                 rowIndexVar="index"
+                                 emptyMessage="#{langue.tableau_vide}"
+                                 widgetVar="fonctionTable"
+                                 draggableColumns="true"
+                                 resizableColumns="true"
+                                 editMode="cell">
+
+                        <f:facet name="header"> 
+                            <h:outputText value="#{langue.budget}"/>
+                        </f:facet>
+
+                        <p:columnGroup type="header">
+                            <p:row>
+                                <p:column class="hardBreak" colspan="4" rowspan="2" headerText="#{langue.indicateur}"/>
+                                <p:column class="hardBreak" colspan="#{budgetController.sousperiodecostings.size()}" headerText="#{langue.periode}"/> 
+                            </p:row>
+                            <p:row>
+                                <ui:repeat value="#{budgetController.sousperiodecostings}" var="sp">
+                                    <p:column class="hardBreak" headerText="#{sp.idperiode.nom}"/>
+                                </ui:repeat>
+                            </p:row>
+                        </p:columnGroup>
+
+                        <p:column colspan="4">
+                            <h:outputText value="#{item.idindicateur.idtypeindicateur.code} #{item.idindicateur.code} #{item.idindicateur.nom}"/>
+                        </p:column>
+
+                        <p:columns style="text-align: right" value="#{budgetController.sousperiodecostings}" var="var">
+                            <h:outputText value="#{budgetController.loadValue(item.idindicateur,var)}">
+                                <f:convertNumber/>
+                            </h:outputText>
+                        </p:columns>
+
+                        <p:columnGroup type="footer">
+                            <p:row>
+                                <p:column colspan="4" style="text-align:right" footerText="Totaux" />                                       
+                                <p:columns style="text-align: right" value="#{budgetController.sousperiodecostings}" var="s" footerText="#{budgetController.sommeBudget(s)}">                        
+                                </p:columns>                
+                            </p:row>
+                        </p:columnGroup>
+
+                    </p:dataTable>
+
+                    <p:separator/>
+
+                    <center>
+                        <p:commandButton value="#{langue.annuler}"
+                                         oncomplete="PF('UtilisateurCreerDialog').hide()"
+                                         icon="ui-icon-close"
+                                         update=":UtilisateurListerForm:datalist,:actionsForm"/>
+                    </center>
+
+                </h:panelGroup>  
+
+            </h:form>
+
+        </p:dialog>
+
+    </ui:composition>
+
+</html>

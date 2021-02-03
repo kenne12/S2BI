@@ -1,0 +1,132 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <f:metadata>
+        <f:event type="preRenderView" listener="#{loginBean.watcher()}" />
+    </f:metadata> 
+
+    <!-- BEGIN SIDEBAR -->
+    <div class="sidebar-scroll">
+        <div id="sidebar" class="nav-collapse collapse">
+
+            <!-- BEGIN RESPONSIVE QUICK SEARCH FORM -->
+            <div class="navbar-inverse">
+                <form class="navbar-search visible-phone">
+                    <input type="text" class="search-query" placeholder="Search" />
+                </form>
+            </div>
+            <!-- END RESPONSIVE QUICK SEARCH FORM -->
+            <!-- BEGIN SIDEBAR MENU -->
+            <ul class="sidebar-menu">
+
+                <!--Accueil-->
+                <li class="sub-menu" id="menuIndex">
+                    <a class="" href="#{request.contextPath}/index.html">
+                        <i class="icon-home"></i>
+                        <span>#{langue.accueil}</span>
+                    </a>
+                </li>
+
+                <!--Securité-->
+                <li class="sub-menu" id="securite">
+                    <a href="javascript:;" class="">
+                        <i class="icon-legal"></i>
+                        <span>#{langue.securite}</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <ul class="sub">
+                        <li><a class="" href="#{request.contextPath}/securite/utilisateur/utilisateur.html">#{langue.utilisateurs}</a></li>
+                        <li><a class="" href="#{request.contextPath}/securite/privilege/privilege.html">#{langue.privileges}</a></li>
+                        <li><a class="" href="#{request.contextPath}/securite/utilisateur_costing/utilisateur_costing.html">#{langue.costing_par_utilisateur}</a></li>
+                        <li><a class="" href="#{request.contextPath}/securite/activercompte/activercompte.html">#{langue.activer_compte_utilisateur}</a></li>
+                        <li><a class="" href="#{request.contextPath}/securite/desactivercompte/desactivercompte.html">#{langue.desactiver_compte_utilisateur}</a></li>
+                        <li><a class="" href="#{request.contextPath}/securite/reset-compte/reset-compte.html">#{langue.reinitialiser_compte}</a></li>
+                        <li><a class="" href="#{request.contextPath}/securite/mouchard/mouchard.html">#{langue.mouchard}</a></li>
+                    </ul>
+                </li>
+
+                <!--parametrage-->
+                <li class="sub-menu" id="parametrage">
+                    <a href="javascript:;" class="">
+                        <i class="icon-cogs"></i>
+                        <span>#{langue.parametrage}</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <ul class="sub">
+                        <li><a class="" href="#{request.contextPath}/parametrage/groupe-indicateur/groupe-indicateur.html">#{langue.groupe_indicateur}</a></li>
+                        <li><a class="" href="#{request.contextPath}/parametrage/type-indicateur/type-indicateur.html">#{langue.type_indicateur}</a></li>
+                        <li><a class="" href="#{request.contextPath}/parametrage/periode/periode.html">#{langue.periode}</a></li>
+                        <li><a class="" href="#{request.contextPath}/parametrage/niveau-pyramide/niveau-pyramide.html">#{langue.niveau_pyramide}</a></li>
+                        <li><a class="" href="#{request.contextPath}/parametrage/type-unite-organisation/type-unite-organisation.html">#{langue.type_unite_organisation}</a></li>
+                        <li><a class="" href="#{request.contextPath}/parametrage/unite-organisation/unite-organisation.html">#{langue.unite_organisation}</a></li>
+                        <li><a class="" href="#{request.contextPath}/parametrage/source-financement/source-financement.html">#{langue.source_financement}</a></li>
+                        <li><a class="" href="#{request.contextPath}/parametrage/bailleur-fond/bailleur-fond.html">#{langue.bailleur_fond}</a></li>
+                        <li><a class="" href="#{request.contextPath}/parametrage/periode-costing/periode-costing.html">#{langue.periode_costing}</a></li>
+                        <li><a class="" href="#{request.contextPath}/parametrage/devise/devise.html">#{langue.devises}</a></li>
+                    </ul>
+                </li>
+
+                <!--Caisse-->
+                <li class="sub-menu" id="traitement">
+                    <a href="javascript:;" class="">
+                        <i class="icon-euro"></i>
+                        <span>#{langue.donnees_de_base}</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <ul class="sub">
+                        <li><a class="" href="#{request.contextPath}/operation/indicateur/indicateur.html">#{langue.indicateur}</a></li>
+                        <li><a class="" href="#{request.contextPath}/operation/indicateur_par_tuo/indicateur_par_tuo.html">#{langue.indicateur_type_structure}</a></li>
+                        <li><a class="" href="#{request.contextPath}/operation/population/population.html">#{langue.couverture_population}</a></li>
+                        <li><a class="" href="#{request.contextPath}/operation/cible/cible.html">#{langue.programmation_cible} Fosa</a></li>
+                        <li><a class="" href="#{request.contextPath}/operation/cible_autre/cible_autre.html">#{langue.programmation_cible} Autres</a></li>
+                        <li><a class="" href="#{request.contextPath}/operation/realisation/realisation.html">#{langue.realisation}</a></li>                                                                              
+                    </ul>
+                </li>
+
+                <!--Costing-->
+                <li class="sub-menu" id="costing">
+                    <a href="javascript:;" class="">
+                        <i class="icon-euro"></i>
+                        <span>#{langue.costing}</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <ul class="sub">
+                        <li><a class="" href="#{request.contextPath}/operation/projection/projection.html">#{langue.projection_couverture}</a></li>
+                        <li><a class="" href="#{request.contextPath}/operation/projection_cible/projection_cible.html">#{langue.projection_cible}</a></li>                                                
+                        <li><a class="" href="#{request.contextPath}/operation/projection-score-equite/projection-score-equite.html">#{langue.score_equite}</a></li>
+                        <li><a class="" href="#{request.contextPath}/operation/projection_cu/projection_cu.html">#{langue.cout_unitaire}</a></li>
+                        <li><a class="" href="#{request.contextPath}/operation/projection_majoration/projection_majoration.html">#{langue.majoration}</a></li>
+                        <li><a class="" href="#{request.contextPath}/operation/baq/baq.html">#{langue.baq}</a></li>
+                        <li><a class="" href="#{request.contextPath}/operation/score_qualite/score_qualite.html">#{langue.score_qualite}</a></li>
+                        <li><a class="" href="#{request.contextPath}/operation/costing_financement/costing_financement.html">#{langue.engagement_financement}</a></li>
+                        <li><a class="" href="#{request.contextPath}/operation/budget/budget.html">#{langue.generer_budget}</a></li>
+                        <li><a class="" href="#{request.contextPath}/operation/financement_budget/financement_budget.html">#{langue.generer_financement}</a></li>
+                        <li><a class="" href="#{request.contextPath}/operation/projection_devise/projection_devise.html">#{langue.projection_devise}</a></li>
+                    </ul>
+                </li>
+
+                <!--Analyse-->
+                <li class="sub-menu" id="analyse">
+                    <a href="javascript:;" class="">
+                        <i class="icon-print"></i>
+                        <span>#{langue.analyse}</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <ul class="sub">
+                        <li><a class="" href="#{request.contextPath}/analyse/budget/budget.html">#{langue.budget}</a></li>
+                        <li><a class="" href="#{request.contextPath}/analyse/financement_budget/financement_budget.html">#{langue.financement}</a></li>
+                        <li><a class="" href="#{request.contextPath}/analyse/budget_par_uo/budget_par_uo.html">#{langue.budget_par_uo}</a></li> 
+                        <li><a class="" href="#{request.contextPath}/analyse/budget_par_tuo/budget_par_tuo.html">#{langue.budget_par_tuo}</a></li>         
+                        <li><a class="" href="#{request.contextPath}/analyse/budget_par_sf/budget_par_sf.html">#{langue.budget_par_sf}</a></li>
+                        <li><a class="" href="#{request.contextPath}/analyse/budget_par_habitant/budget_par_habitant.html">#{langue.budget_par_habitant}</a></li> 
+                    </ul>
+                </li>
+
+            </ul>
+            <!-- END SIDEBAR MENU -->
+        </div>
+    </div>
+    <!-- END SIDEBAR -->
+
+</ui:composition>

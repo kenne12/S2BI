@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition>
+
+        <p:dialog id="UtilisateurCreerDlg" 
+                  widgetVar="UtilisateurCreerDialog" 
+                  modal="true" resizable="false" 
+                  appendTo="@(body)" 
+                  header="#{langue['Titre.Dlg.Creation']} : #{langue.bailleur_fond}" 
+                  closeOnEscape="true">
+
+            <h:form id="UtilisateurCreerForm">
+                <h:panelGroup id="display">
+                    <h:panelGrid columns="3" columnClasses="column">
+                        
+                        <p:outputLabel for="source_fi" value="#{langue.source_financement}"/>
+                        <p:selectOneMenu id="source_fi" value="#{bailleurFondController.sourcefinancement.idsourcefinancement}">
+                            <f:selectItem itemLabel="#{langue.choisir}" itemValue=""/>
+                            <f:selectItems value="#{bailleurFondController.sourcefinancements}" var="item" itemLabel="#{item.nom}" itemValue="#{item.idsourcefinancement}"/>
+                        </p:selectOneMenu>
+                        <p:message for="source_fi" id="msg_source_fi"/>
+                        
+                        <p:outputLabel value="#{langue.code}" for="code" />
+                        <p:inputText id="code" value="#{bailleurFondController.bailleurfond.code}" required="true" 
+                                     requiredMessage="#{langue.valeur_obligatoire}"/>
+                        <p:message for="code" id="msg_code"/>
+
+                        <p:outputLabel value="#{langue.nom}" for="nom"/>
+                        <p:inputText id="nom" value="#{bailleurFondController.bailleurfond.nom}" required="true" 
+                                     requiredMessage="#{langue.valeur_obligatoire}"/>
+                        <p:message for="nom" id="msg_nom"/>
+                                              
+                    </h:panelGrid>
+
+                    <p:separator/>
+
+                    <p:commandButton style="float: right" actionListener="#{bailleurFondController.create()}" 
+                                     value="#{langue['Conv.Enregistrer']}" 
+                                     update="display,:UtilisateurListerForm:datalist,:notify1,:actionsForm" 
+                                     onclick="PF('AjaxNotifyDialog').show()" icon="ui-icon-check"/>
+
+                    <p:commandButton style="float: left" value="#{langue.annuler}" oncomplete="PF('UtilisateurCreerDialog').hide()" icon="ui-icon-close"/>
+                </h:panelGroup>  
+
+            </h:form>
+
+        </p:dialog>
+
+    </ui:composition>
+
+</html>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition>
+
+        <p:dialog id="UtilisateurCreerDlg" 
+                  widgetVar="UtilisateurCreerDialog" 
+                  modal="true" resizable="false" 
+                  appendTo="@(body)"
+                  width="1200"
+                  height="650"
+                  style="overflow: auto"
+                  header="#{langue['Titre.Dlg.Creation']} : #{langue.majoration}" 
+                  closeOnEscape="true">
+
+            <h:form id="UtilisateurCreerForm">
+                <h:panelGroup id="display">
+
+                    <center>
+                        <h:panelGrid columns="3" columnClasses="column">
+
+                            <p:outputLabel value="#{langue.unite_organisation}" for="unite_organisation"/>
+                            <p:selectOneMenu id="unite_organisation" filter="true" value="#{majorationController.uniteorganisation.iduniteorganisation}" >
+                                <f:selectItem itemLabel="#{langue.choisir}" itemValue="0"/>
+                                <f:selectItems value="#{majorationController.uniteorganisations}" var="uo" itemLabel="#{uo.nom}" itemValue="#{uo.iduniteorganisation}"/>
+                                <p:ajax update="datalist,val_inf,val_sup" listener="#{majorationController.updateData()}" />
+                            </p:selectOneMenu>
+                            <p:message for="unite_organisation" id="msg_uo" />
+
+                            <p:outputLabel value="#{langue.periode_costing}" for="periode_costing"/>
+                            <p:selectOneMenu id="periode_costing" filter="true" value="#{majorationController.periodecosting.idperiodecosting}" >
+                                <f:selectItem itemLabel="#{langue.choisir}" itemValue="0"/>
+                                <f:selectItems value="#{majorationController.periodecostings}" var="pc" itemLabel="#{pc.libelle}" itemValue="#{pc.idperiodecosting}"/>
+                                <p:ajax update="datalist,val_inf,val_sup" listener="#{majorationController.updateData()}" />
+                            </p:selectOneMenu>
+                            <p:message for="periode_costing" id="msg_pc" />
+
+                            <p:outputLabel value="#{langue.mode_projection}" for="mode_projection"/>
+                            <p:selectOneMenu id="mode_projection" filter="true" value="#{majorationController.modeProjection}" >
+                                <f:selectItem itemLabel="#{langue.choisir}" itemValue="0"/>
+                                <f:selectItem itemLabel="#{langue.interpollation_lineaire}" itemValue="1"/>
+                                <p:ajax update="datalist" listener="#{majorationController.updateRenderedColumn()}" />
+                            </p:selectOneMenu>
+                            <p:message for="mode_projection" id="msg_mod_projection"/>
+
+                            <p:outputLabel value="#{langue.valeur_inferieur}" for="val_inf"/>
+                            <p:inputText id="val_inf" value="#{majorationController.couverturepopulation.majValDebut}" />
+                            <p:message for="val_inf" id="msg_val_inf"/>
+
+                            <p:outputLabel value="#{langue.valeur_superieur}" for="val_sup"/>
+                            <p:inputText id="val_sup" value="#{majorationController.couverturepopulation.majValFin}" />
+                            <p:message for="val_sup" id="msg_val_sup"/>
+
+                        </h:panelGrid>
+                    </center>
+
+                    <p:separator/>
+
+                    <center>
+                        <p:commandButton update="datalist,:notify1" actionListener="#{majorationController.generate()}" value="#{langue.generer}" onclick="PF('AjaxNotifyDialog').show()" />
+                    </center>
+
+                    <p:separator/>
+
+                    <p:dataTable id="datalist" 
+                                 value="#{majorationController.selecteds}" 
+                                 var="item"                             
+                                 paginator="true"
+                                 editable="true" 
+                                 rowKey="#{item.idcouverturepopulation}"
+                                 rows="15"
+                                 rowsPerPageTemplate="10,20,30,40,50"
+                                 style="width: 98%;margin-left: 1%"
+                                 rowIndexVar="index"
+                                 emptyMessage="#{langue.tableau_vide}"
+                                 widgetVar="fonctionTable"
+                                 draggableColumns="true"
+                                 resizableColumns="true"
+                                 editMode="cell">
+
+                        <f:facet name="header"> 
+                            <h:outputText value="#{langue.periode}"/>
+                        </f:facet> 
+
+                        <p:column style="width: 15%" filterBy="#{item.idperiode.nom}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{langue.periode}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.idperiode.nom}"/>
+                        </p:column>  
+
+                        <p:column style="width: 20%;text-align: center" headerText="#{langue.valeur}">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{item.majoration}"/></f:facet>
+                                <f:facet  name="input">
+                                    <p:inputText required="true" value="#{item.majoration}">                                             
+                                        <p:ajax event="keyup"/>
+                                    </p:inputText>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+
+                    </p:dataTable>
+
+                    <p:separator/>
+                    
+                    <center>
+                        <p:commandButton style="" value="#{langue.annuler}" oncomplete="PF('UtilisateurCreerDialog').hide()" icon="ui-icon-close"/>
+                    </center>
+                    
+                </h:panelGroup>  
+
+            </h:form>
+
+        </p:dialog>
+
+    </ui:composition>
+
+</html>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>TODO supply a title</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </h:head>
+    <h:body>
+
+        <h:form id="SelectPeriodCreerForm">
+
+            <p:dataTable id="datalist"
+                         value="#{projectionCuController.ciblerealisations}"
+                         var="item"
+                         rowKey="#{item.idciblerealisation}"
+                         paginator="true"
+                         rows="10"
+                         editable="true"
+                         editMode="cell"
+                         style="width: 50%;margin-left: 25%"
+                         rowsPerPageTemplate="10,20,30,40,50">
+
+                <p:column filterBy="#{item.iduniteorganisation.nom}" style="width: 35%">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.unite_organisation}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.iduniteorganisation.nom} "/>
+                </p:column>
+
+                <p:column filterBy="#{item.idperiode.nom}" style="width: 20%">
+                    <f:facet name="header">
+                        <h:outputText value="#{langue.periode}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.idperiode.nom} "/>
+                </p:column>
+
+                <p:column  style="width: 10%" headerText="#{langue.valeur}">
+                    <p:cellEditor>
+                        <f:facet name="output">
+                            <h:outputText value="#{item.couverture}"/>
+                        </f:facet>
+
+                        <f:facet name="input">
+                            <p:inputText required="true" value="#{item.couverture}">                                
+                                <p:ajax event="keyup" />
+                            </p:inputText>
+                        </f:facet>  
+                    </p:cellEditor>
+                </p:column>
+
+            </p:dataTable>
+
+            <p:separator/>
+
+            <p:commandButton style="float: right" actionListener="#{projectionCuController.create()}" 
+                             value="#{langue['Conv.Enregistrer']}" 
+                             update="datalist" 
+                             onclick="PF('AjaxNotifyDialog').show()" icon="ui-icon-check"/>
+
+            <p:commandButton style="float: left" value="#{langue.annuler}" oncomplete="PF('SelectPeriodDialog').hide()" icon="ui-icon-close"/>
+
+        </h:form>
+
+    </h:body>
+</html>

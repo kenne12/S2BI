@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <h:form id="UtilisateurListerForm">
+
+        <p:messages id="growl" closable="true">
+            <p:effect type="pulsate" event="load" delay="50" />
+        </p:messages>
+
+        <br/>
+
+        <center>
+            <h:panelGrid columns="6" columnClasses="column">
+
+                <p:outputLabel value="#{langue.unite_organisation}" for="unite_organisation"/>
+                <p:selectOneMenu id="unite_organisation" filter="true" value="#{scoreQualiteController.uniteorganisation.iduniteorganisation}" >
+                    <f:selectItem itemLabel="#{langue.choisir}" itemValue="0"/>
+                    <f:selectItems value="#{scoreQualiteController.uniteorganisations}" var="uo" itemLabel="#{uo.nom}" itemValue="#{uo.iduniteorganisation}"/>
+                    <p:ajax update="datalist" listener="#{scoreQualiteController.updateData()}" />
+                </p:selectOneMenu>
+                <p:message for="unite_organisation" id="msg_uo"/>
+
+                <p:outputLabel value="#{langue.periode_costing}" for="periode_costing"/>
+                <p:selectOneMenu id="periode_costing" filter="true" value="#{scoreQualiteController.periodecosting.idperiodecosting}" >
+                    <f:selectItem itemLabel="#{langue.choisir}" itemValue="0"/>
+                    <f:selectItems value="#{scoreQualiteController.periodecostings}" var="pc" itemLabel="#{pc.libelle}" itemValue="#{pc.idperiodecosting}"/>
+                    <p:ajax update="datalist" listener="#{scoreQualiteController.updateData()}" />
+                </p:selectOneMenu>
+                <p:message for="periode_costing" id="msg_pc"/>
+
+            </h:panelGrid>
+        </center>
+
+        <p:separator/>
+
+        <p:contextMenu id="UtilisateurDataTableContextMenu" for="datalist">  
+            <p:menuitem value="#{langue['Conv.Creer']}" onclick="document.getElementById('actionsForm:creer').click();" icon="ui-icon-plus"/>
+            <p:menuitem value="#{langue['Conv.Detail']}" onclick="document.getElementById('actionsForm:detail').click();" icon="ui-icon-search"/>
+            <p:menuitem value="#{langue['Conv.Modifier']}" onclick="document.getElementById('actionsForm:modifier').click();" icon="ui-icon-pencil"/>
+            <p:menuitem value="#{langue['Conv.Supprimer']}" onclick="document.getElementById('actionsForm:supprimer').click();" icon="ui-icon-trash"/>
+        </p:contextMenu>
+
+        <p:dataTable id="datalist" 
+                     value="#{scoreQualiteController.selectedScQs}" 
+                     var="item"                             
+                     paginator="true"
+                     rowKey="#{item.idLigneScoreEquite}"
+                     rows="15"
+                     rowsPerPageTemplate="10,20,30,40,50"
+                     style="width: 98%;margin-left: 1%"
+                     rowIndexVar="index"
+                     emptyMessage="#{langue.tableau_vide}"
+                     widgetVar="fonctionTable"
+                     draggableColumns="true"
+                     resizableColumns="true"
+                     selectionMode="single"
+                     selection="#{scoreQualiteController.ligneScoreEquite}">
+
+            <p:ajax event="rowSelect" update=":UtilisateurListerForm:UtilisateurDataTableContextMenu, :actionsForm"/>
+            <p:ajax event="rowUnselect" update=":UtilisateurListerForm:UtilisateurDataTableContextMenu, :actionsForm"/>
+
+            <f:facet name="header"> 
+                <h:outputText value="#{langue.score_qualite}"/>
+            </f:facet>
+
+            <p:columnGroup type="header">
+                <p:row>
+                    <p:column class="hardBreak" colspan="3" rowspan="2" headerText="#{langue.rubrique}"/>
+                    <p:column class="hardBreak" rowspan="2" headerText="#{langue.poids_max}"/>
+                    <p:column class="hardBreak" colspan="#{scoreQualiteController.couverturepopulations.size()}" headerText="#{langue.periode}"/> 
+                    <p:column class="hardBreak" rowspan="2" headerText="#{langue.pas}"/>
+                </p:row>
+                <p:row>
+                    <ui:repeat value="#{scoreQualiteController.couverturepopulations}" var="cp">
+                        <p:column class="hardBreak" headerText="#{cp.idsousperiode.idperiode.nom}"/>
+                    </ui:repeat>
+                </p:row>
+            </p:columnGroup>
+
+            <p:column colspan="3" >
+                <h:outputText value="#{item.idrubriqueScore.nom}"/>
+            </p:column>
+
+            <p:column style="text-align: center">
+                <h:outputText value="#{item.idrubriqueScore.poids}" >
+                    <f:convertNumber/>
+                </h:outputText>
+            </p:column>       
+
+            <p:columns style="text-align: center" value="#{scoreQualiteController.couverturepopulations}" var="var">
+                <h:outputText value="#{scoreQualiteController.loadValue(var,item.idrubriqueScore).valeur}">
+                    <f:convertNumber/>
+                </h:outputText>
+            </p:columns>
+
+            <p:column style="text-align: center">
+                <h:outputText value="#{item.pas}">
+
+                </h:outputText>
+            </p:column>
+
+            <p:columnGroup type="footer">
+                <p:row>
+                    <p:column colspan="4" style="text-align:right" footerText="Totaux" />                                       
+                    <p:columns value="#{scoreQualiteController.couverturepopulations}" var="c" footerText="#{c.valScoreQualite}">
+                        
+                    </p:columns>
+                    <p:column style="text-align: center" footerText=""/>
+                </p:row>
+            </p:columnGroup>
+
+        </p:dataTable>
+
+    </h:form>
+
+    <!-- ****************************************Information************************************************************************************************************************************************************************************************************** -->
+
+    <p:dialog id="notify1" widgetVar="NotifyDialog1" height="400" width="700" resizable="true" responsive="true" modal="true" style="text-align: center; font-size: 14px; font-family: Cambria;">
+        <f:facet name="header">
+            <h:outputText style="font-family: Cambria; font-size: 14px;" value="#{scoreQualiteController.routine.titleNotify}" />
+        </f:facet>
+        <h:form id="NotifyForm1">
+            <h:graphicImage id="nt_img" url="#{scoreQualiteController.routine.iconMessage}" style="cursor:pointer" />
+
+            <hr size="3" style="background-color: cornflowerblue;"/>
+
+            <h:outputText id="nt_msg" value="#{scoreQualiteController.routine.message}"/>
+
+            <hr size="3" style="background-color: cornflowerblue; margin-top: 5%;"/>
+
+            <p:commandButton style="font-family: Cambria; font-size: 14px;" value="#{langue.fermer}" onclick="PF('NotifyDialog1').hide()" type="button" immediate="true"/>
+
+            <hr size="3" style="background-color: cornflowerblue;"/>
+        </h:form>
+    </p:dialog>
+
+    <!-- ****************************************Information************************************************************************************************************************************************************************************************************** -->
+</ui:composition>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <h:form id="UtilisateurListerForm">
+
+        <p:messages id="growl" closable="true">
+            <p:effect type="pulsate" event="load" delay="50" />
+        </p:messages>
+
+        <br/>
+
+        <center>
+            <h:panelGrid columns="9" columnClasses="column">
+
+                <p:outputLabel value="#{langue.type_unite_organisation}" for="tuo"/>
+                <p:selectOneMenu id="tuo" filter="true" value="#{budgetParUoController.typeuniteorganisation.idtypeuniteorganisation}" >
+                    <f:selectItem itemLabel="#{langue.choisir}" itemValue="0"/>
+                    <f:selectItems value="#{budgetParUoController.typeuniteorganisations}" var="tuo" itemLabel="#{tuo.nom}" itemValue="#{tuo.idtypeuniteorganisation}"/>
+                    <p:ajax update="datalist" listener="#{budgetParUoController.updateData()}" />
+                </p:selectOneMenu>
+                <p:message for="tuo" id="msg_tuo"/>
+
+                <p:outputLabel value="#{langue.costing}" for="periode_costing"/>
+                <p:selectOneMenu id="periode_costing" filter="true" value="#{budgetParUoController.periodecosting.idperiodecosting}" >
+                    <f:selectItem itemLabel="#{langue.choisir}" itemValue="0"/>
+                    <f:selectItems value="#{budgetParUoController.periodecostings}" var="pc" itemLabel="#{pc.libelle}" itemValue="#{pc.idperiodecosting}"/>
+                    <p:ajax update="datalist" listener="#{budgetParUoController.updateData()}" />
+                </p:selectOneMenu>
+                <p:message for="periode_costing" id="msg_pc"/>
+                
+                <p:outputLabel value="#{langue.devise}" for="devise"/>
+                <p:selectOneMenu id="devise" filter="true" value="#{budgetParUoController.devise.iddevise}" >
+                    <f:selectItems value="#{budgetParUoController.devises}" var="dev" itemLabel="#{dev.nom}" itemValue="#{dev.iddevise}"/>
+                    <p:ajax update="datalist" listener="#{budgetParUoController.updateDevise()}"/>
+                </p:selectOneMenu>
+                <p:message for="devise" id="msg_devise"/>
+
+            </h:panelGrid>
+        </center>
+
+        <p:separator/>
+
+        <p:dataTable id="datalist" 
+                     value="#{budgetParUoController.selectedBudgets}" 
+                     var="item"                             
+                     paginator="true"
+                     rowKey="#{item.idbudget}"
+                     rows="15"
+                     rowsPerPageTemplate="10,20,30,40,50"
+                     style="width: 98%;margin-left: 1%"
+                     rowIndexVar="index"
+                     emptyMessage="#{langue.tableau_vide}"
+                     widgetVar="fonctionTable"
+                     draggableColumns="true"
+                     resizableColumns="true">     
+
+            <f:facet name="header"> 
+                <h:outputText value="#{langue.budget}"/>
+            </f:facet>
+
+            <p:columnGroup type="header">
+                <p:row>
+                    <p:column class="hardBreak" colspan="4" rowspan="2" headerText="#{langue.unite_organisation}"/>
+                    <p:column class="hardBreak" colspan="#{budgetParUoController.sousperiodecostings.size()}" headerText="#{langue.periode}"/> 
+                    <p:column class="hardBreak" rowspan="2" headerText="#{langue.totaux}"/> 
+                </p:row>
+                <p:row>
+                    <ui:repeat value="#{budgetParUoController.sousperiodecostings}" var="spc">
+                        <p:column class="hardBreak" headerText="#{spc.idperiode.nom}"/>
+                    </ui:repeat>
+                </p:row>
+            </p:columnGroup>
+
+            <p:column colspan="4" >
+                <h:outputText value="#{item.iduniteorganisation.nom}"/>
+            </p:column>
+
+            <p:columns style="text-align: right" value="#{budgetParUoController.sousperiodecostings}" var="var">
+                <h:outputText value="#{budgetParUoController.loadValue(item.iduniteorganisation,var)}">
+                    <f:convertNumber/>
+                </h:outputText>
+            </p:columns>
+            
+            <p:column style="text-align: right">
+                <h:outputText value="#{budgetParUoController.loadValue1(item.iduniteorganisation)}">
+                    <f:convertNumber/>
+                </h:outputText>
+            </p:column>
+            
+            <p:columnGroup type="footer">
+                <p:row>
+                    <p:column colspan="4" style="text-align:right" footerText="Totaux" />                                       
+                    <p:columns style="text-align: right" value="#{budgetParUoController.sousperiodecostings}" var="s" footerText="#{budgetParUoController.sommeBudget(s)}">                        
+                    </p:columns>
+                    <p:column style="text-align:right" footerText="#{budgetParUoController.loadValue()}" />
+                </p:row>
+            </p:columnGroup>
+
+        </p:dataTable>
+
+    </h:form>
+
+    <!-- ****************************************Information************************************************************************************************************************************************************************************************************** -->
+
+    <p:dialog id="notify1" widgetVar="NotifyDialog1" height="400" width="700" resizable="true" responsive="true" modal="true" style="text-align: center; font-size: 14px; font-family: Cambria;">
+        <f:facet name="header">
+            <h:outputText style="font-family: Cambria; font-size: 14px;" value="#{budgetParUoController.routine.titleNotify}" />
+        </f:facet>
+        <h:form id="NotifyForm1">
+            <h:graphicImage id="nt_img" url="#{budgetParUoController.routine.iconMessage}" style="cursor:pointer" />
+
+            <hr size="3" style="background-color: cornflowerblue;"/>
+
+            <h:outputText id="nt_msg" value="#{budgetParUoController.routine.message}"/>
+
+            <hr size="3" style="background-color: cornflowerblue; margin-top: 5%;"/>
+
+            <p:commandButton style="font-family: Cambria; font-size: 14px;" value="#{langue.fermer}" onclick="PF('NotifyDialog1').hide()" type="button" immediate="true"/>
+
+            <hr size="3" style="background-color: cornflowerblue;"/>
+        </h:form>
+    </p:dialog>
+
+    <!-- ****************************************Information************************************************************************************************************************************************************************************************************** -->
+</ui:composition>

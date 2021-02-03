@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <h:form id="UtilisateurListerForm">
+
+        <p:messages id="growl" closable="true">
+            <p:effect type="pulsate" event="load" delay="50" />
+        </p:messages>
+
+        <br/>
+
+        <p:contextMenu id="UtilisateurDataTableContextMenu" for="datalist">  
+            <p:menuitem value="#{langue['Conv.Creer']}" onclick="document.getElementById('actionsForm:creer').click();" icon="ui-icon-plus"/>
+            <p:menuitem value="#{langue['Conv.Detail']}" onclick="document.getElementById('actionsForm:detail').click();" icon="ui-icon-search"/>
+            <p:menuitem value="#{langue['Conv.Modifier']}" onclick="document.getElementById('actionsForm:modifier').click();" icon="ui-icon-pencil"/>
+            <p:menuitem value="#{langue['Conv.Supprimer']}" onclick="document.getElementById('actionsForm:supprimer').click();" icon="ui-icon-trash"/>
+        </p:contextMenu>
+        <p:dataTable id="datalist"
+                     value="#{projectionDeviseController.devisePeriodes}"
+                     var="item"
+                     rowKey="#{item.iddevisePeriode}"
+                     paginator="true"
+                     rows="10"
+                     style="width: 60%;margin-left: 20%"
+                     rowsPerPageTemplate="10,20,30,40,50"
+                     selectionMode="single"
+                     selection="#{projectionDeviseController.devisePeriode}">
+
+            <p:ajax event="rowSelect"   update=":UtilisateurListerForm:UtilisateurDataTableContextMenu, :actionsForm"/>
+            <p:ajax event="rowUnselect" update=":UtilisateurListerForm:UtilisateurDataTableContextMenu, :actionsForm"/>
+            <p:ajax event="rowDblselect" onsuccess="document.getElementById('UtilisateurListerForm:viewButton').click();"/>
+
+            <p:column filterBy="#{item.iddevise.nom}" style="width: 35%">
+                <f:facet name="header">
+                    <h:outputText value="#{langue.devises}"/>
+                </f:facet>
+                <h:outputText value="#{item.iddevise.nom} "/>
+            </p:column>
+
+            <p:column filterBy="#{item.idperiode.nom}" style="width: 35%">
+                <f:facet name="header">
+                    <h:outputText value="#{langue.periode}"/>
+                </f:facet>
+                <h:outputText value="#{item.idperiode.nom} "/>
+            </p:column>
+
+            <p:column filterBy="#{item.valeur}" style="width: 30%">
+                <f:facet name="header">
+                    <h:outputText value="#{langue.valeur} (FCFA)"/>
+                </f:facet>
+                <h:outputText value="#{item.valeur}" >
+                    <f:convertNumber/>
+                </h:outputText>
+            </p:column>
+
+        </p:dataTable>
+
+    </h:form>
+
+    <!-- ****************************************Information************************************************************************************************************************************************************************************************************** -->
+
+    <p:dialog id="notify1" widgetVar="NotifyDialog1" height="400" width="700" resizable="true" responsive="true" modal="true" style="text-align: center; font-size: 14px; font-family: Cambria;">
+        <f:facet name="header">
+            <h:outputText style="font-family: Cambria; font-size: 14px;" value="#{projectionDeviseController.routine.titleNotify}" />
+        </f:facet>
+        <h:form id="NotifyForm1">
+            <h:graphicImage id="nt_img" url="#{projectionDeviseController.routine.iconMessage}" style="cursor:pointer" />
+
+            <hr size="3" style="background-color: cornflowerblue;"/>
+
+            <h:outputText id="nt_msg" value="#{projectionDeviseController.routine.message}"/>
+
+            <hr size="3" style="background-color: cornflowerblue; margin-top: 5%;"/>
+
+            <p:commandButton style="font-family: Cambria; font-size: 14px;" value="#{langue.fermer}" onclick="PF('NotifyDialog1').hide()" type="button" immediate="true"/>
+
+            <hr size="3" style="background-color: cornflowerblue;"/>
+        </h:form>
+    </p:dialog>
+
+    <!-- ****************************************Information************************************************************************************************************************************************************************************************************** -->
+</ui:composition>

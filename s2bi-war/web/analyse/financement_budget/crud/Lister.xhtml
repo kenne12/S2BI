@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+
+    <h:form id="FinancementGenerateForm">
+
+        <h:panelGrid columns="3">
+
+
+        </h:panelGrid>
+
+    </h:form>
+
+
+    <h:form id="UtilisateurListerForm">
+
+        <p:messages id="growl" closable="true">
+            <p:effect type="pulsate" event="load" delay="50" />
+        </p:messages>
+
+        <br/>
+
+        <center>
+            <h:panelGrid columns="9" columnClasses="column">
+
+                <p:outputLabel value="#{langue.costing}" for="periode_costing"/>
+                <p:selectOneMenu id="periode_costing" filter="true" value="#{financementBudgetController.periodecosting.idperiodecosting}" >
+                    <f:selectItem itemLabel="#{langue.choisir}" itemValue="0"/>
+                    <f:selectItems value="#{financementBudgetController.periodecostings}" var="pc" itemLabel="#{pc.libelle}" itemValue="#{pc.idperiodecosting}"/>
+                    <p:ajax update=":notify1,:UtilisateurListerForm:datalist" listener="#{financementBudgetController.updateData()}" />
+                </p:selectOneMenu>
+
+                <p:outputLabel value="#{langue.bailleur_fond}" for="unite_organisation"/>
+                <p:selectOneMenu id="unite_organisation" filter="true" value="#{financementBudgetController.bailleurfond.idbailleurfond}" >
+                    <f:selectItem itemLabel="#{langue.choisir}" itemValue="0"/>
+                    <f:selectItems value="#{financementBudgetController.bailleurfonds}" var="bf" itemLabel="#{bf.nom}" itemValue="#{bf.idbailleurfond}"/>
+                    <p:ajax update="datalist" listener="#{financementBudgetController.updateData()}" />
+                </p:selectOneMenu>
+                <p:message for="unite_organisation" id="msg_uo"/>
+                
+                <p:outputLabel value="#{langue.devise}" for="devise"/>
+                <p:selectOneMenu id="devise" filter="true" value="#{financementBudgetController.devise.iddevise}" >
+                    <f:selectItems value="#{financementBudgetController.devises}" var="dev" itemLabel="#{dev.nom}" itemValue="#{dev.iddevise}"/>
+                    <p:ajax update="datalist" listener="#{financementBudgetController.updateDevise()}"/>
+                </p:selectOneMenu>
+                <p:message for="devise" id="msg_devise"/>
+
+            </h:panelGrid>
+        </center>
+
+        <p:separator/>
+
+        <p:dataTable id="datalist" 
+                     value="#{financementBudgetController.selectedfinancementbudgets}" 
+                     var="item"                             
+                     paginator="true"
+                     rowKey="#{item.idfinancementbudget}"
+                     rows="15"
+                     rowsPerPageTemplate="10,20,30,40,50"
+                     style="width: 98%;margin-left: 1%"
+                     rowIndexVar="index"
+                     emptyMessage="#{langue.tableau_vide}"
+                     widgetVar="fonctionTable"
+                     draggableColumns="true"
+                     resizableColumns="true"
+                     selectionMode="single"
+                     selection="#{financementBudgetController.financementbudget}">
+
+            <p:ajax event="rowSelect"/>
+            <p:ajax event="rowUnselect"/>
+
+            <f:facet name="header"> 
+                <h:outputText value="#{langue.budget}"/>
+            </f:facet>
+
+            <p:columnGroup type="header">
+                <p:row>
+                    <p:column class="hardBreak" colspan="3" rowspan="2" headerText="#{langue.type_unite_organisation}"/>
+                    <p:column class="hardBreak" colspan="#{financementBudgetController.sousperiodecostings.size()}" headerText="#{langue.periode}"/> 
+                    <p:column class="hardBreak" rowspan="2" headerText="#{langue.total}"/>
+                </p:row>
+                <p:row>
+                    <ui:repeat value="#{financementBudgetController.sousperiodecostings}" var="spc">
+                        <p:column class="hardBreak" headerText="#{spc.idperiode.nom}"/>
+                    </ui:repeat>
+                </p:row>                
+            </p:columnGroup>
+
+            <p:column colspan="3" >
+                <h:outputText value="#{item.idtypeUo.nom}"/>
+            </p:column>
+
+            <p:columns style="text-align: right" value="#{financementBudgetController.sousperiodecostings}" var="var">
+                <h:outputText value="#{financementBudgetController.loadValue(item.idtypeUo,var)}">
+                    <f:convertNumber/>
+                </h:outputText>
+            </p:columns>
+
+            <p:column style="text-align: right">
+                <h:outputText value="#{financementBudgetController.resteBuget(item.idtypeUo)}"/>
+            </p:column>
+
+            <p:columnGroup type="footer">
+                <p:row>
+                    <p:column colspan="3" style="text-align:right" footerText="Totaux" />                                       
+                    <p:columns style="text-align: right" value="#{financementBudgetController.sousperiodecostings}" var="s" footerText="#{financementBudgetController.sommeBudget(s)}">                        
+                    </p:columns> 
+                    <p:column style="text-align:right" footerText="#{financementBudgetController.totauxBuget()}" />
+                </p:row>
+            </p:columnGroup>
+
+
+        </p:dataTable>
+
+    </h:form>
+
+    <!-- ****************************************Information************************************************************************************************************************************************************************************************************** -->
+
+    <p:dialog id="notify1" widgetVar="NotifyDialog1" height="400" width="700" resizable="true" responsive="true" modal="true" style="text-align: center; font-size: 14px; font-family: Cambria;">
+        <f:facet name="header">
+            <h:outputText style="font-family: Cambria; font-size: 14px;" value="#{financementBudgetController.routine.titleNotify}" />
+        </f:facet>
+        <h:form id="NotifyForm1">
+            <h:graphicImage id="nt_img" url="#{financementBudgetController.routine.iconMessage}" style="cursor:pointer" />
+
+            <hr size="3" style="background-color: cornflowerblue;"/>
+
+            <h:outputText id="nt_msg" value="#{financementBudgetController.routine.message}"/>
+
+            <hr size="3" style="background-color: cornflowerblue; margin-top: 5%;"/>
+
+            <p:commandButton style="font-family: Cambria; font-size: 14px;" value="#{langue.fermer}" onclick="PF('NotifyDialog1').hide()" type="button" immediate="true"/>
+
+            <hr size="3" style="background-color: cornflowerblue;"/>
+        </h:form>
+    </p:dialog>
+
+    <!-- ****************************************Information************************************************************************************************************************************************************************************************************** -->
+</ui:composition>
